@@ -1,0 +1,32 @@
+# .github/CODEOWNERS
+# Wymagani reviewerzy dla plików chronionych.
+#
+# PRZED ROZPOCZĘCIEM PRACY RÓWNOLEGŁEJ:
+# Zastąp @osoba-a, @osoba-b, @osoba-c prawdziwymi loginami GitHub członków teamu.
+# Następnie na GitHub: Settings → Branches → main → Require review from Code Owners.
+#
+# Obecne wartości to placeholdery — branch protection nie zadziała dopóki
+# nie zostaną zamienione na faktyczne konta GitHub.
+
+# Pliki współdzielone — wymagana akceptacja wszystkich trzech osób
+/shared/src/                                    @osoba-a @osoba-b @osoba-c
+/.github/workflows/                             @osoba-a @osoba-b @osoba-c
+/docker-compose.yml                             @osoba-a @osoba-b @osoba-c
+
+# Właściciel: Osoba A
+/server/src/db/migrations/001_core.sql          @osoba-a
+/client/src/games/registry.ts                   @osoba-a
+/client/src/styles/design-tokens.css            @osoba-a
+/server/src/modules/auth/                       @osoba-a
+
+# Właściciel: Osoba B
+/server/src/db/migrations/002_scores_stats.sql  @osoba-b
+/server/src/modules/scores/                     @osoba-b
+/server/src/modules/leaderboard/                @osoba-b
+
+# Właściciel: Osoba C
+/server/src/socket/index.ts                              @osoba-c
+/server/src/socket/roomManager.ts                        @osoba-c
+/server/src/db/migrations/003_realtime_achievements.sql  @osoba-c
+/server/src/modules/matchmaking/                         @osoba-c
+/server/src/modules/rooms/                               @osoba-c

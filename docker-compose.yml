@@ -1,0 +1,68 @@
+# docker-compose.yml
+# Orkiestracja kontenerów: PostgreSQL, serwer Node.js i klient React/Vite.
+# Kontekst budowania server i client to root projektu (.) — wymagane dla shared/.
+# Zmiany w tym pliku wymagają PR zatwierdzonego przez cały team.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cardplay_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    volumes:
+      - cardplay_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: cardplay_server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-3000}
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5173}
+      ALLOW_TEST_SEED: ${ALLOW_TEST_SEED:-false}
+    ports:
+      - '${PORT:-3000}:3000'
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared/src:/app/shared/src
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: cardplay_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
+      VITE_SOCKET_URL: ${VITE_SOCKET_URL:-http://localhost:3000}
+    ports:
+      - '${CLIENT_PORT:-5173}:5173'
+    volumes:
+      - ./client/src:/app/client/src
+      - ./shared/src:/app/shared/src
+
+volumes:
+  cardplay_db_data:

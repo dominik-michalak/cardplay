@@ -1,0 +1,15 @@
+{
+  "_comment": "shared/package.json — konfiguracja pakietu @cardplay/shared. Definiuje punkt wejścia (dist/index.js po zbudowaniu), skrypt build (tsc) i dev (tsc --watch). Nie zawiera zależności runtime — tylko typy TypeScript.",
+  "name": "@cardplay/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
